@@ -131,7 +131,7 @@ def checkTempPress(temp13,press13,temp23,press23,i):
             Pass_Label.grid(row=1,column=3)
             SystemOff.config(state=tk.NORMAL)
             CycleOn.config(state=tk.DISABLED)
-            CycleOff.config(state=tk.DISABLED)
+            CycleOff.config(state=tk.NORMAL)
             SystemOn.config(state=tk.DISABLED)
     else:
         enable=0
@@ -141,7 +141,7 @@ def checkTempPress(temp13,press13,temp23,press23,i):
         Pass_Label.grid(row=1,column=3)
         SystemOff.config(state=tk.NORMAL)
         CycleOn.config(state=tk.DISABLED)
-        CycleOff.config(state=tk.DISABLED)
+        CycleOff.config(state=tk.NORMAL)
         SystemOn.config(state=tk.DISABLED)
     return enable
 def checkDHT22(temp,humid):
@@ -160,7 +160,7 @@ def checkDHT22(temp,humid):
         info_box.configure(state="disabled")
         SystemOff.config(state=tk.NORMAL)
         CycleOn.config(state=tk.DISABLED)
-        CycleOff.config(state=tk.DISABLED)
+        CycleOff.config(state=tk.NORMAL)
         SystemOn.config(state=tk.DISABLED)
         ErrorLogFile.write(str(datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S"))+" Faulty DHT22 Sensor Please Check Wiring\n")
     return enable1
@@ -193,7 +193,7 @@ def disp_temp():
         press13+=press1
         press2=Press.getPress2()
         press23+=press2
-        #temp13=temp23=76
+        temp13=temp23=76
         # press13=press23=6
         temp_label1 = tk.Label(frame1, text=temp1, font=("Arial",10,'bold'),foreground="Black")
         temp_label1.grid(row=4, column=3)
@@ -245,17 +245,18 @@ def systemOff():
     global row_num
     global flag
     flag = 1
-    row_num = row_num+1
-    label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[3])
-    label.grid(row=row_num, column=3)
-    txt=data[2]
-    global downloadButton
-    downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,end_txt),width=10)
-    downloadButton.grid(row=row_num, column=10)
-    pressure_label2 = tk.Label(frame1, text="                    ", font=("Arial", 10,'bold'),foreground="Black")
-    pressure_label2.grid(row=3, column=5,sticky="w")
-    ProgressLabel = tk.Label(frame1,text="                       ",height=1)
-    ProgressLabel.grid(row=3, column=6)
+    if data != []:
+        row_num = row_num+1
+        label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[3])
+        label.grid(row=row_num, column=3)
+        txt=data[2]
+        global downloadButton
+        downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,end_txt),width=10)
+        downloadButton.grid(row=row_num, column=10)
+        pressure_label2 = tk.Label(frame1, text="                    ", font=("Arial", 10,'bold'),foreground="Black")
+        pressure_label2.grid(row=3, column=5,sticky="w")
+        ProgressLabel = tk.Label(frame1,text="                       ",height=1)
+        ProgressLabel.grid(row=3, column=6)
     info_box.config(state='normal')
     info_box.delete(1.0,END)
     info_box.config(state='disabled')
@@ -319,6 +320,7 @@ def cycleOn():
       sensor_data.append(Press.getPress2())
       sensor_data.append(Temp.getTemp2())
       temp,humidity=TempHumidity.getTempHumidity()
+      print(sensor_data[3])
       enable1=checkDHT22(temp,humidity)
       enable=checkTempPress(sensor_data[3],sensor_data[2],sensor_data[5],sensor_data[4],1)
       if enable == 0 or enable1 == 0:
@@ -344,8 +346,6 @@ def cycleOn():
       dataBase.addSensorData(sensor_data)
       dataBase.addCycleData(cycle_data)
       time.sleep(1)
-    window.update()
-    return
 def cycleOff():
     # for i in range(2,8):
     #     Pass_Label = tk.Label(frame1, text="              ",font=("Arial", 10,'bold'),foreground="GREEN")
@@ -354,25 +354,27 @@ def cycleOff():
     pressure_label2.grid(row=3, column=5,sticky="w")
     ProgressLabel = tk.Label(frame1,text="                      ",height=1)
     ProgressLabel.grid(row=3, column=6)
-    global data
-    global end_txt
-    end_txt = datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
-    global stop
-    global row_num
-    global flag
-    flag = 1
-    row_num = row_num+1
-    label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[3])
-    label.grid(row=row_num, column=3)
-    txt=data[2]
-    global downloadButton
-    downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,end_txt),width=10)
-    downloadButton.grid(row=row_num, column=10)
+    print(enable)
+    if sensor_data != []:
+        global data
+        global end_txt
+        end_txt = datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
+        global stop
+        global row_num
+        global flag
+        flag = 1
+        row_num = row_num+1
+        label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[3])
+        label.grid(row=row_num, column=3)
+        txt=data[2]
+        global downloadButton
+        downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,end_txt),width=10)
+        downloadButton.grid(row=row_num, column=10)
+        downloadButton.config(state=tk.NORMAL)
     stop = False
     CycleOn.config(state=tk.NORMAL)
     CycleOff.config(state=tk.DISABLED)
     CumCycleDownload.config(state=tk.NORMAL)
-    downloadButton.config(state=tk.NORMAL)
     window.update()
     return
 def export_data(timestamp,end_txt):
