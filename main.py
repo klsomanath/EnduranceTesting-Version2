@@ -42,7 +42,7 @@ Header.grid(row=0,column=0,sticky="e")
 Header2 = tk.Label(frame_header,text="                                                                                             Endurance Testing",font=("Arial", 14,'bold'),foreground="Black")
 Header2.grid(row=1,column=0,sticky="nsew")
 
-img = Image.open("/home/somanath/Documents/EnduranceTesting/NuconLogo.png")
+img = Image.open("NuconLogo.png")
 img = ImageTk.PhotoImage(img,master=frame_header)
 img_label = tk.Label(frame_header,image = img)
 img_label.image = img
