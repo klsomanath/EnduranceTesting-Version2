@@ -355,8 +355,7 @@ def cycleOff():
     pressure_label2.grid(row=3, column=5,sticky="w")
     ProgressLabel = tk.Label(frame1,text="                      ",height=1)
     ProgressLabel.grid(row=3, column=6)
-    print(enable)
-    if sensor_data != []:
+    if data != []:
         global data
         global end_txt
         end_txt = datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
