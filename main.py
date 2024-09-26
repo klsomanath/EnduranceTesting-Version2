@@ -14,6 +14,7 @@ import csv
 global row_num,end_txt
 row_num=0
 global data
+data=[]
 global sensor_data
 global flag, temp,pressure,stop,itr_time,sv013,sv02
 itr_time=2
