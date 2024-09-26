@@ -15,7 +15,8 @@ global row_num,end_txt
 row_num=0
 global data
 data=[]
-global sensor_data
+global sensor_data, display
+display=0
 global flag, temp,pressure,stop,itr_time,sv013,sv02
 itr_time=2
 flag = 0
@@ -244,16 +245,16 @@ def systemOff():
     end_txt = datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
     global stop
     global row_num
-    global flag
+    global flag, display
     flag = 1
-    if data != []:
+    if data != [] and display == 0:
         row_num = row_num+1
-        label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[3])
-        label.grid(row=row_num, column=3)
-        txt=data[2]
+        label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[2])
+        label.grid(row=row_num, column=2)
+        txt=data[1]
         global downloadButton
         downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,end_txt),width=10)
-        downloadButton.grid(row=row_num, column=10)
+        downloadButton.grid(row=row_num, column=9)
         pressure_label2 = tk.Label(frame1, text="                    ", font=("Arial", 10,'bold'),foreground="Black")
         pressure_label2.grid(row=3, column=5,sticky="w")
         ProgressLabel = tk.Label(frame1,text="                       ",height=1)
@@ -279,8 +280,9 @@ def systemOff():
     return
 def cycleOn():
     initialDate=datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
-    global flag
-    flag = 0
+    #print(initialDate)
+    global flag, display
+    flag = display = 0
     global itr_time
     global sensor_data
     global stop
@@ -321,7 +323,7 @@ def cycleOn():
       sensor_data.append(Press.getPress2())
       sensor_data.append(Temp.getTemp2())
       temp,humidity=TempHumidity.getTempHumidity()
-      print(sensor_data[3])
+      #print(sensor_data[3])
       enable1=checkDHT22(temp,humidity)
       enable=checkTempPress(sensor_data[3],sensor_data[2],sensor_data[5],sensor_data[4],1)
       if enable == 0 or enable1 == 0:
@@ -355,8 +357,8 @@ def cycleOff():
     pressure_label2.grid(row=3, column=5,sticky="w")
     ProgressLabel = tk.Label(frame1,text="                      ",height=1)
     ProgressLabel.grid(row=3, column=6)
+    global data
     if data != []:
-        global data
         global end_txt
         end_txt = datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
         global stop
@@ -364,13 +366,15 @@ def cycleOff():
         global flag
         flag = 1
         row_num = row_num+1
-        label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[3])
-        label.grid(row=row_num, column=3)
-        txt=data[2]
+        label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[2])
+        label.grid(row=row_num, column=2)
+        txt=data[1]
         global downloadButton
         downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,end_txt),width=10)
-        downloadButton.grid(row=row_num, column=10)
+        downloadButton.grid(row=row_num, column=9)
         downloadButton.config(state=tk.NORMAL)
+        global display
+        display = 1
     stop = False
     CycleOn.config(state=tk.NORMAL)
     CycleOff.config(state=tk.DISABLED)
@@ -427,7 +431,7 @@ def Cycle_downloader():
    t5 = threading.Thread(target=export_data)
    t5.start()
 def CumCycle_downloader():
-    print("Downloading...")
+    #print("Downloading...")
     conn = sqlite3.connect('EnduranceTesting.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM SensorData")
@@ -504,19 +508,40 @@ pressure_label2.grid(row=8, column=1,sticky="w")
 # #--------------------- Table Frame ------------------------
 
 frame_table = tk.Frame(window, border=4,relief=RIDGE)
-frame_table.place(relx=0, rely=11/24, relwidth=1, relheight=2/5)
+frame_table.place(relx=0, rely=11/24, relwidth=0.765, relheight=2/5)
 
-header_labels = ["","S No", "Start Date & Time", "End Date & Time", "SV01", "SV02","Press. Sensor 1","Temp. Sensor 1","Press. Sensor 2","Temp. Sensor 2","Download"]
+frame_table2 = tk.Frame(window, border=4,relief=RIDGE)
+frame_table2.place(relx=0.765, rely=11/24, relwidth=0.234, relheight=2/5)
+
+
+canvas1 = tk.Canvas(frame_table2,height=400,width=410)
+scrollbar1 = tk.Scrollbar(frame_table2, orient="vertical", command=canvas1.yview)
+canvas1.configure(yscrollcommand=scrollbar1.set)
+canvas1.grid(row=1, column=0, columnspan=4, sticky="nsew")
+scrollbar1.grid(row=1, column=4, sticky="ns")
+frame1 = tk.Frame(canvas1)
+canvas1.create_window((0, 0), window=frame1, anchor="e")
+canvas1.config(scrollregion=(0, 0, frame1.winfo_width(), frame1.winfo_height()))
+canvas1.yview_moveto(1.0)
+
+label = tk.Label(frame_table2, text="Historical Data", font=("Arial", 12, "bold"))
+label.grid(row=0, column=2)
+
+conn = sqlite3.connect('EnduranceTesting.db')
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM CycleData")
+
+header_labels = ["S No", "Start Date & Time", "End Date & Time", "SV01", "SV02","Press. Sensor 1","Temp. Sensor 1","Press. Sensor 2","Temp. Sensor 2","Download"]
 
 widthlist=[]
 for i, label_text in enumerate(header_labels):
     chars=len(label_text)
-    if i==0:
-        label = tk.Label(frame_table, text=label_text, font=("Arial", 12, "bold"),width=15)
-        widthlist.append(15)
-    else:
-        label = tk.Label(frame_table, text=label_text, font=("Arial", 12, "bold"),width=chars+4)
-        widthlist.append(chars+4)
+    # if i==0:
+    #     label = tk.Label(frame_table, text=label_text, font=("Arial", 12, "bold"),width=15)
+    #     widthlist.append(15)
+    # else:
+    label = tk.Label(frame_table, text=label_text, font=("Arial", 12, "bold"),width=chars+4)
+    widthlist.append(chars+4)
     label.grid(row=0, column=i)
 
 canvas = tk.Canvas(frame_table,height=350)
@@ -544,10 +569,10 @@ def disp_tempPress(sv013,sv02,now,press1,temp1,press2,temp2):
 #   data[6]=temp1
 #   data[7]=press2
 #   data[8]=temp2
-  data.extend(["",row_num+1,now,0,sv013,sv02,press1,temp1,press2,temp2])
+  data.extend([row_num+1,now,0,sv013,sv02,press1,temp1,press2,temp2])
   #print(data)
   for col_num, data_item in enumerate(data):
-    if col_num == 3:
+    if col_num == 2:
         widths=19
     else:
        widths = widthlist[col_num]
