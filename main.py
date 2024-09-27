@@ -369,8 +369,9 @@ def cycleOff():
         label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[2])
         label.grid(row=row_num, column=2)
         txt=data[1]
+        data_end=end_txt
         global downloadButton
-        downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,end_txt),width=10)
+        downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,data_end),width=10)
         downloadButton.grid(row=row_num, column=9)
         downloadButton.config(state=tk.NORMAL)
         global display
@@ -555,7 +556,6 @@ canvas1.yview_moveto(1.0)
 frame12.update_idletasks() 
 
 def export_hist_data(datee):
-    print(datee)
     conn = sqlite3.connect('EnduranceTesting.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM SensorData WHERE DateTime LIKE ?",(datee+"%",))
@@ -576,15 +576,17 @@ def export_hist_data(datee):
     
     return
 row_num2=0
-for datee in databaselist:
+for i in range(len(databaselist)):
+    date_full=databaselist[i]
+    print(date_full)
     label = tk.Label(frame12, text=row_num2+1, font=("Arial", 12, "bold"))
     label.grid(row=row_num2+1, column=0)
-    label = tk.Label(frame12, text=datee, font=("Arial", 12, "bold"))
+    label = tk.Label(frame12, text=databaselist[i], font=("Arial", 12, "bold"))
     label.grid(row=row_num2+1, column=1)
-    downloadButton = tk.Button(frame12, text="Download",command=lambda: export_hist_data(datee),width=10)
-    downloadButton.grid(row=row_num2+1, column=2,padx=10)
+    downloadButtonhist = tk.Button(frame12, text="Download",command=lambda: export_hist_data(date_full),width=10)
+    downloadButtonhist.grid(row=row_num2+1, column=2,padx=10)
     row_num2+=1
-    downloadButton.config(state=tk.NORMAL)
+    downloadButtonhist.config(state=tk.NORMAL)
 
 
 header_labels = ["S No", "Start Date & Time", "End Date & Time", "SV01", "SV02","Press. Sensor 1","Temp. Sensor 1","Press. Sensor 2","Temp. Sensor 2","Download"]
