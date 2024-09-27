@@ -513,40 +513,79 @@ frame_table.place(relx=0, rely=11/24, relwidth=0.765, relheight=2/5)
 frame_table2 = tk.Frame(window, border=4,relief=RIDGE)
 frame_table2.place(relx=0.765, rely=11/24, relwidth=0.234, relheight=2/5)
 
-header_labels2 = ["S No", "Start Date & Time", "End Date & Time","Download"]
+header_labels2 = ["S No", "Date","Download"]
 canvas1 = tk.Canvas(frame_table2,height=370,width=410)
 scrollbar1 = tk.Scrollbar(frame_table2, orient="vertical", command=canvas1.yview)
 canvas1.configure(yscrollcommand=scrollbar1.set)
 canvas1.grid(row=1, column=0, columnspan=len(header_labels2), sticky="nsew")
 scrollbar1.grid(row=1, column=len(header_labels2), sticky="ns")
-frame1 = tk.Frame(canvas1)
-canvas1.create_window((0, 0), window=frame1, anchor="e")
-canvas1.config(scrollregion=(0, 0, frame1.winfo_width(), frame1.winfo_height()))
+frame12 = tk.Frame(canvas1)
+canvas1.create_window((0, 0), window=frame12, anchor="e")
+canvas1.config(scrollregion=(0, 0, frame12.winfo_width(), frame12.winfo_height()))
 canvas1.yview_moveto(1.0)
-
+frame12.rowconfigure(list(range(10)), weight = 1, uniform="Silent_Creme")
+frame12.columnconfigure(list(range(3)), weight = 1, uniform="Silent_Creme")
 label = tk.Label(frame_table2, text="Historical Data", font=("Arial", 12, "bold"))
-label.grid(row=0, column=2)
+label.grid(row=0, column=1)
 
 conn = sqlite3.connect('EnduranceTesting.db')
 cursor = conn.cursor()
 cursor.execute("SELECT * FROM SensorData")
 rows = cursor.fetchall()
+conn.close()
 databaselist=[]
 for row in rows:
     datee = row[1].split(" ")[0]
     if datee not in databaselist:
         databaselist.append(datee)
-conn.close()
-
-if databaselist != []:
-    label = tk.Label(frame1, text="No Historical Data", font=("Arial", 12, "bold"))
-    label.grid(row=5, column=3)
+        
+if databaselist == []:
+    label = tk.Label(frame12, text="No Historical Data", font=("Arial", 12, "bold"))
+    label.grid(row=0, column=1)
 else:
     widthlist=[]
     for i, label_text in enumerate(header_labels2):
         chars=len(label_text)
-        label = tk.Label(frame1, text=label_text, font=("Arial", 12, "bold"),width=chars+4)
-        label.grid(row=i, column=2)
+        label = tk.Label(frame12, text=label_text, font=("Arial", 12, "bold"),width=chars+4)
+        label.grid(row=0, column=i)
+
+canvas1.create_window((0, 0), window=frame12, anchor="nw")
+canvas1.config(scrollregion=(0, 0, frame12.winfo_width(), frame12.winfo_height()))
+canvas1.yview_moveto(1.0)
+frame12.update_idletasks() 
+
+def export_hist_data(datee):
+    print(datee)
+    conn = sqlite3.connect('EnduranceTesting.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM SensorData WHERE DateTime LIKE ?",(datee+"%",))
+    dataSensor=cursor.fetchall()
+    cursor.execute("SELECT * FROM CycleData WHERE DateTime LIKE ?",(datee+"%",))
+    dataCycle=cursor.fetchall()
+    conn.close()
+    filename = f"export_All {datee} HistoricSensorData.csv"
+    with open(filename, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(["S.No", "Time", "Pressure Sensor - 1","Temparature Sensor - 1","Pressure Sensor - 2","Temparature Sensor - 2"])
+        csvwriter.writerows(dataSensor)
+    filename1 = f"export_All {datee} HistoricCycleData.csv"
+    with open(filename1, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(["S.No", "Time", "SV - 01","SV - 02","SV - 03"])
+        csvwriter.writerows(dataCycle)
+    
+    return
+row_num2=0
+for datee in databaselist:
+    label = tk.Label(frame12, text=row_num2+1, font=("Arial", 12, "bold"))
+    label.grid(row=row_num2+1, column=0)
+    label = tk.Label(frame12, text=datee, font=("Arial", 12, "bold"))
+    label.grid(row=row_num2+1, column=1)
+    downloadButton = tk.Button(frame12, text="Download",command=lambda: export_hist_data(datee),width=10)
+    downloadButton.grid(row=row_num2+1, column=2,padx=10)
+    row_num2+=1
+    downloadButton.config(state=tk.NORMAL)
+
 
 header_labels = ["S No", "Start Date & Time", "End Date & Time", "SV01", "SV02","Press. Sensor 1","Temp. Sensor 1","Press. Sensor 2","Temp. Sensor 2","Download"]
 
