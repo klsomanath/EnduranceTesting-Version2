@@ -556,6 +556,7 @@ canvas1.yview_moveto(1.0)
 frame12.update_idletasks() 
 
 def export_hist_data(datee):
+    print(datee)
     conn = sqlite3.connect('EnduranceTesting.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM SensorData WHERE DateTime LIKE ?",(datee+"%",))
@@ -576,14 +577,12 @@ def export_hist_data(datee):
     
     return
 row_num2=0
-for i in range(len(databaselist)):
-    date_full=databaselist[i]
-    print(date_full)
+for j in range(len(databaselist)):
     label = tk.Label(frame12, text=row_num2+1, font=("Arial", 12, "bold"))
     label.grid(row=row_num2+1, column=0)
-    label = tk.Label(frame12, text=databaselist[i], font=("Arial", 12, "bold"))
+    label = tk.Label(frame12, text=databaselist[j], font=("Arial", 12, "bold"))
     label.grid(row=row_num2+1, column=1)
-    downloadButtonhist = tk.Button(frame12, text="Download",command=lambda: export_hist_data(date_full),width=10)
+    downloadButtonhist = tk.Button(frame12, text="Download",command=lambda date_full=databaselist[j]: export_hist_data(date_full),width=10)
     downloadButtonhist.grid(row=row_num2+1, column=2,padx=10)
     row_num2+=1
     downloadButtonhist.config(state=tk.NORMAL)
