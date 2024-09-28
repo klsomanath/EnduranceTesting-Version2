@@ -182,10 +182,10 @@ def disp_temp():
         humidity = str(humidity) + " mg"
 
         temp_val = tk.Label(frame1, text=temp, font=("Arial",10,'bold'),foreground="Black")
-        temp_val.grid(row=2, column=3)
+        temp_val.grid(row=3, column=3)
 
         humidity_val = tk.Label(frame1, text=humidity, font=("Arial", 10,'bold'),foreground="Black")
-        humidity_val.grid(row=3, column=3)
+        humidity_val.grid(row=4, column=3)
 
         temp1=Temp.getTemp1()
         temp13+=temp1
@@ -198,16 +198,16 @@ def disp_temp():
         temp13=temp23=76
         # press13=press23=6
         temp_label1 = tk.Label(frame1, text=temp1, font=("Arial",10,'bold'),foreground="Black")
-        temp_label1.grid(row=4, column=3)
+        temp_label1.grid(row=5, column=3)
 
         pressure_label1 = tk.Label(frame1, text=temp2, font=("Arial", 10,'bold'),foreground="Black")
-        pressure_label1.grid(row=5, column=3)
+        pressure_label1.grid(row=6, column=3)
 
         temp_label2 = tk.Label(frame1, text=press1, font=("Arial",10,'bold'),foreground="Black")
-        temp_label2.grid(row=6, column=3)
+        temp_label2.grid(row=7, column=3)
 
         pressure_label2 = tk.Label(frame1, text=press2, font=("Arial", 10,'bold'),foreground="Black")
-        pressure_label2.grid(row=7, column=3)
+        pressure_label2.grid(row=8, column=3)
         window.update()
     if (temp11/2 >= 35 and temp11/2 <= 40) and (humid1/2 >= 50 and humid1/2 <= 70):
         enable=checkTempPress(temp13,press13,temp23,press23,2)
@@ -226,7 +226,7 @@ def disp_temp():
       CycleOff.config(state=tk.DISABLED)
       SystemOn.config(state=tk.DISABLED)
       return
-    for i in range(2,8):
+    for i in range(3,8):
         if i not in fault:
             Pass_Label = tk.Label(frame1, text="PASS",font=("Arial", 10,'bold'),foreground="GREEN")
             Pass_Label.grid(row=i,column=4)   
@@ -265,7 +265,7 @@ def systemOff():
     ErrorLogFile.close()
     Pass_Label = tk.Label(frame1, text="          ",font=("Arial", 10,'bold'))
     Pass_Label.grid(row=1,column=3)
-    for i in range(2,8):
+    for i in range(3,8):
         Pass_Label = tk.Label(frame1, text="          ",font=("Arial", 10,'bold'))
         Pass_Label.grid(row=i,column=4)
     global stop
@@ -479,7 +479,7 @@ info_box = tk.Text(frame_body1_right, state="disabled", width=110, height=18.5)
 info_box.pack()
 
 frame1.rowconfigure(list(range(9)), weight = 1, uniform="Silent_Creme")
-frame1.columnconfigure(list(range(2,7)), weight = 1, uniform="Silent_Creme")
+frame1.columnconfigure(list(range(6)), weight = 1, uniform="Silent_Creme")
 
 SystemOn = tk.Button(frame1, text="System On",command=system_starter,font=("Arial", 12,'bold'),width=10)
 SystemOn.grid(row=0, column=0)
@@ -492,7 +492,7 @@ CycleOn = tk.Button(frame1, text="Cycle On",command=Cycle_starter,font=("Arial",
 CycleOn.grid(row=2, column=0)
 CycleOn.config(state=tk.DISABLED)
 
-labels = ["POWER ON","PASS","SYSTEM ON","Env. Temparature","Env. Humidity","Temp. sensor - 1","Press. Sensor - 1","Temp. sensor - 2","Press. Sensor - 2"]
+labels = ["POWER ON","PASS","SYSTEM ON","","Env. Temparature","Env. Humidity","Temp. sensor - 1","Press. Sensor - 1","Temp. sensor - 2","Press. Sensor - 2"]
 row_num1=0
 for label_it in labels:
     if label_it == "PASS":
@@ -506,6 +506,23 @@ for label_it in labels:
 pressure_label2 = tk.Label(frame1, text="           ", font=("Arial", 12,'bold'),foreground="Black")
 pressure_label2.grid(row=8, column=1,sticky="w")
 
+PartNolabel = tk.Label(frame1, text="Part No: ",font=("Arial",12,'bold'))
+PartNolabel.grid(row=0,column=4,sticky="w")
+
+PartNoinfo_box = tk.Text(frame1, state="normal",width=18,height=1)
+PartNoinfo_box.grid(row=0,column=5)
+
+SerialNolabel = tk.Label(frame1, text="Serial No: ",font=("Arial",12,'bold'))
+SerialNolabel.grid(row=1,column=4,sticky="w")
+
+PartNoinfo_box = tk.Text(frame1, state="normal",width=18,height=1)
+PartNoinfo_box.grid(row=1,column=5)
+
+Userlabel = tk.Label(frame1, text="User: ",font=("Arial",12,'bold'))
+Userlabel.grid(row=2,column=4,sticky="w")
+
+PartNoinfo_box = tk.Text(frame1, state="normal",width=18,height=1)
+PartNoinfo_box.grid(row=2,column=5)
 # #--------------------- Table Frame ------------------------
 
 frame_table = tk.Frame(window, border=4,relief=RIDGE)
