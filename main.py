@@ -72,7 +72,7 @@ def systemOn():
     return
 def checkPress(press1,press2,i):
     global ErrorLogFile
-    if (press1/i < 1 or press1/i > 5):
+    if (press1/i < 0.5 or press1/i > 5):
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
         Pass_Label.grid(row=1,column=3)
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
@@ -83,7 +83,7 @@ def checkPress(press1,press2,i):
         info_box.see(tk.END)
         info_box.configure(state="disabled")
         ErrorLogFile.write(str(datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S"))+" Faulty Pressure Sensor 1 Please Check Wiring !!!\n")
-    if (press2/i < 1 or press2/i > 5):
+    if (press2/i < 0.5 or press2/i > 5):
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
         Pass_Label.grid(row=1,column=3)
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
@@ -96,7 +96,7 @@ def checkPress(press1,press2,i):
         ErrorLogFile.write(str(datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S"))+" Faulty Pressure Sensor 2 Please Check Wiring !!!\n")
 def checkTemp(temp1,temp2,i):
     global ErrorLogFile
-    if (temp1/i < 35 or temp1/i > 40):
+    if (temp1/i < 20 or temp1/i > 50):
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
         Pass_Label.grid(row=1,column=3)
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
@@ -107,7 +107,7 @@ def checkTemp(temp1,temp2,i):
         info_box.see(tk.END)
         info_box.configure(state="disabled")
         ErrorLogFile.write(str(datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S"))+" Faulty Temparature Sensor 1 Please Check Wiring !!!\n")
-    if (temp2/i < 35 or temp2/i > 40):
+    if (temp2/i < 20 or temp2/i > 50):
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
         Pass_Label.grid(row=1,column=3)
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
@@ -120,8 +120,8 @@ def checkTemp(temp1,temp2,i):
         ErrorLogFile.write(str(datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S"))+" Faulty Temparature Sensor 2 Please Check Wiring !!!\n")
 def checkTempPress(temp13,press13,temp23,press23,i):
     global ErrorLogFile
-    if (temp13/i >= 35 and temp13/i <= 40) and (temp23/i >= 35 and temp23/i <= 40):
-        if (press13/i >= 1 and press13/i <= 5) and (press23/i >= 1 and press23/i <= 5):
+    if (temp13/i >= 20 and temp13/i <= 50) and (temp23/i >= 20 and temp23/i <= 50):
+        if (press13/i >= 0.5 and press13/i <= 5) and (press23/i >= 0.5 and press23/i <= 5):
             enable=1
             Pass_Label = tk.Label(frame1, text="PASS",font=("Arial", 10,'bold'),foreground="GREEN")
             Pass_Label.grid(row=1,column=3)
@@ -149,7 +149,7 @@ def checkTempPress(temp13,press13,temp23,press23,i):
 def checkDHT22(temp,humid):
     global ErrorLogFile
     enable1=0
-    if (temp >= 35 and temp <= 40) and (humid >= 50 and humid <= 70):
+    if (temp >= 20 and temp <= 50) and (humid >= 20 and humid <= 99):
         enable1=1
     else:
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
@@ -195,21 +195,21 @@ def disp_temp():
         press13+=press1
         press2=Press.getPress2()
         press23+=press2
-        temp13=temp23=76
+        # temp13=temp23=76
         # press13=press23=6
         temp_label1 = tk.Label(frame1, text=temp1, font=("Arial",10,'bold'),foreground="Black")
         temp_label1.grid(row=5, column=3)
 
-        pressure_label1 = tk.Label(frame1, text=temp2, font=("Arial", 10,'bold'),foreground="Black")
+        pressure_label1 = tk.Label(frame1, text=press1, font=("Arial", 10,'bold'),foreground="Black")
         pressure_label1.grid(row=6, column=3)
 
-        temp_label2 = tk.Label(frame1, text=press1, font=("Arial",10,'bold'),foreground="Black")
+        temp_label2 = tk.Label(frame1, text=temp2, font=("Arial",10,'bold'),foreground="Black")
         temp_label2.grid(row=7, column=3)
 
         pressure_label2 = tk.Label(frame1, text=press2, font=("Arial", 10,'bold'),foreground="Black")
         pressure_label2.grid(row=8, column=3)
         window.update()
-    if (temp11/2 >= 35 and temp11/2 <= 40) and (humid1/2 >= 50 and humid1/2 <= 70):
+    if (temp11/2 >= 20 and temp11/2 <= 50) and (humid1/2 >= 20 and humid1/2 <= 99):
         enable=checkTempPress(temp13,press13,temp23,press23,2)
     else:
       Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
@@ -226,7 +226,7 @@ def disp_temp():
       CycleOff.config(state=tk.DISABLED)
       SystemOn.config(state=tk.DISABLED)
       return
-    for i in range(3,8):
+    for i in range(3,9):
         if i not in fault:
             Pass_Label = tk.Label(frame1, text="PASS",font=("Arial", 10,'bold'),foreground="GREEN")
             Pass_Label.grid(row=i,column=4)   
@@ -265,7 +265,7 @@ def systemOff():
     ErrorLogFile.close()
     Pass_Label = tk.Label(frame1, text="          ",font=("Arial", 10,'bold'))
     Pass_Label.grid(row=1,column=3)
-    for i in range(3,8):
+    for i in range(3,9):
         Pass_Label = tk.Label(frame1, text="          ",font=("Arial", 10,'bold'))
         Pass_Label.grid(row=i,column=4)
     global stop
