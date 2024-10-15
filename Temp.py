@@ -6,7 +6,7 @@ def getTemp1():
     max6675.set_pin(cs, sck, so, 1)
     try:
         a = max6675.read_temp(cs)
-        print(a)
+        #print(a)
         return a
     except KeyboardInterrupt:
         return 0
@@ -19,7 +19,7 @@ def getTemp2():
     max6675.set_pin(cs, sck, so, 1)
     try:
         a = max6675.read_temp(cs)
-        print(a)
+        #print(a)
         return a
     except KeyboardInterrupt:
         return 0

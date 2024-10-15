@@ -12,7 +12,7 @@ def getPress1():
     #print(volt)
     current12 = (volt * 10)
     pressure12 = round(((current12 - 4) / (20 - 0)) * 40,2)
-    print(f"Pressure: {pressure12} bar")
+    #print(f"Pressure: {pressure12} bar")
     #time.sleep(1)
     return pressure12
 def getPress2():
@@ -29,5 +29,5 @@ def getPress2():
     #print(volt)
     current12 = (volt * 10)
     pressure12 = round(((current12 - 4) / (20 - 0)) * 40,2)
-    print(f"Pressure: {pressure12} bar")
+    #print(f"Pressure: {pressure12} bar")
     return pressure12

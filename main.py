@@ -57,6 +57,7 @@ Date_Label.grid(row=1,column=1)
 frame_header.rowconfigure(list(range(2)), weight = 1, uniform="Silent_Creme")
 frame_header.columnconfigure(list(range(2)), weight = 1, uniform="Silent_Creme")
 fault=[]
+enable1=1
 ## --------------------- Header Frame ---------------------------------------------
 
 ## --------------------- Frame 1 ---------------------------------------------------
@@ -153,9 +154,9 @@ def checkDHT22(temp,humid):
         enable1=1
     else:
         Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
-        Pass_Label.grid(row=2,column=4)
-        Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
         Pass_Label.grid(row=3,column=4)
+        Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
+        Pass_Label.grid(row=4,column=4)
         info_box.configure(state="normal")
         info_box.insert(tk.END, f"Faulty DHT22 Sensor Please Check Wiring !!!\n\n")
         info_box.see(tk.END)
@@ -180,7 +181,6 @@ def disp_temp():
         temp = str(temp)+"\N{DEGREE SIGN}C"
         humid1+=float(humidity)
         humidity = str(humidity) + " mg"
-
         temp_val = tk.Label(frame1, text=temp, font=("Arial",10,'bold'),foreground="Black")
         temp_val.grid(row=3, column=3)
 
@@ -324,7 +324,7 @@ def cycleOn():
       sensor_data.append(Temp.getTemp2())
       temp,humidity=TempHumidity.getTempHumidity()
       #print(sensor_data[3])
-      enable1=checkDHT22(temp,humidity)
+      #enable1=checkDHT22(temp,humidity)
       enable=checkTempPress(sensor_data[3],sensor_data[2],sensor_data[5],sensor_data[4],1)
       if enable == 0 or enable1 == 0:
         pressure_label2 = tk.Label(frame1, text="                    ", font=("Arial", 10,'bold'))
