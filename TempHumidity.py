@@ -20,5 +20,4 @@ def getTempHumidity():
     if humidity is None and temperature is None:
         return(0,0)
     else:
-        #print(round(temperature,2),round(humidity,2))
         return(round(temperature,2),round(humidity,2))

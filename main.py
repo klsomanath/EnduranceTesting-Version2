@@ -1,30 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-import time
-import TempHumidity
-import threading
+import time,TempHumidity,datetime,Temp,Press,dataBase,sqlite3,csv,threading
 from PIL import ImageTk, Image, ImageSequence
-import datetime
-import Temp
-import Press
-import dataBase
-import sqlite3
-import csv
-global row_num,end_txt
-row_num=0
-global data
-data=[]
-global sensor_data, display
-display=0
-global flag, temp,pressure,stop,itr_time,sv013,sv02
+global row_num,end_txt,data,flag, temp,pressure,stop,itr_time,sv013,sv02,sensor_data, display
+data=sensor_data=fault=[]
+display=flag=row_num=0
 itr_time=2
-flag = 0
+enable1=1
 stop = False
-sensor_data = []
 window=tk.Tk()
-#window.state('zoomed') # For Windows
-#window.wm_attributes('-zoomed', True) # For Linux #gitignore
 w, h = window.winfo_screenwidth(), window.winfo_screenheight()
 window.geometry("%dx%d+0+0" % (w, h))
 window.title("System ON/OFF Controller")
@@ -56,8 +41,6 @@ Date_Label.grid(row=1,column=1)
 
 frame_header.rowconfigure(list(range(2)), weight = 1, uniform="Silent_Creme")
 frame_header.columnconfigure(list(range(2)), weight = 1, uniform="Silent_Creme")
-fault=[]
-enable1=1
 ## --------------------- Header Frame ---------------------------------------------
 
 ## --------------------- Frame 1 ---------------------------------------------------
@@ -169,9 +152,7 @@ def checkDHT22(temp,humid):
     return enable1
 def disp_temp():
     global ErrorLogFile
-    enable=0
-    temp11=temp13=temp23=press13=press23=0
-    humid1=0
+    enable=temp11=temp13=temp23=press13=press23=humid1=0
     for _ in range(2):
         if stop == True:
             return
@@ -195,8 +176,6 @@ def disp_temp():
         press13+=press1
         press2=Press.getPress2()
         press23+=press2
-        # temp13=temp23=76
-        # press13=press23=6
         temp_label1 = tk.Label(frame1, text=temp1, font=("Arial",10,'bold'),foreground="Black")
         temp_label1.grid(row=5, column=3)
 
@@ -240,12 +219,8 @@ def disp_temp():
     window.update()
     return
 def systemOff():
-    global data
-    global end_txt
+    global data,end_txt,stop,row_num,flag, display
     end_txt = datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
-    global stop
-    global row_num
-    global flag, display
     flag = 1
     if data != [] and display == 0:
         row_num = row_num+1
@@ -270,7 +245,6 @@ def systemOff():
         Pass_Label.grid(row=i,column=4)
     global stop
     stop = True
-    #window.update()
     SystemOn.config(state=tk.NORMAL)
     CycleOn.config(state=tk.DISABLED)
     CycleOff.config(state=tk.DISABLED)
@@ -280,15 +254,8 @@ def systemOff():
     return
 def cycleOn():
     initialDate=datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
-    #print(initialDate)
-    global flag, display
-    flag = display = 0
-    global itr_time
-    global sensor_data
-    global stop
-    global sv013,sv02
-    sv013=0
-    sv02=0
+    global flag, display,itr_time,sensor_data,stop,sv013,sv02
+    flag = display = sv013 = sv02 = 0
     stop = True
     CycleOff.config(state=tk.NORMAL)
     CycleOn.config(state=tk.DISABLED)
@@ -300,7 +267,7 @@ def cycleOn():
     gif = Image.open("DownloadFile.gif")
     frames = [ImageTk.PhotoImage(frame.copy().resize(fixed_size, Image.Resampling.LANCZOS)) for frame in ImageSequence.Iterator(gif)]
     ProgressLabel = tk.Label(frame1)
-    ProgressLabel.grid(row=3, column=6)
+    ProgressLabel.grid(row=3, column=6,sticky="w")
     def update_frame(frame_number):
        frame=frames[frame_number]
        ProgressLabel.config(image=frame)
@@ -323,7 +290,6 @@ def cycleOn():
       sensor_data.append(Press.getPress2())
       sensor_data.append(Temp.getTemp2())
       temp,humidity=TempHumidity.getTempHumidity()
-      #print(sensor_data[3])
       #enable1=checkDHT22(temp,humidity)
       enable=checkTempPress(sensor_data[3],sensor_data[2],sensor_data[5],sensor_data[4],1)
       if enable == 0 or enable1 == 0:
@@ -350,27 +316,20 @@ def cycleOn():
       dataBase.addCycleData(cycle_data)
       time.sleep(1)
 def cycleOff():
-    # for i in range(2,8):
-    #     Pass_Label = tk.Label(frame1, text="              ",font=("Arial", 10,'bold'),foreground="GREEN")
-    #     Pass_Label.grid(row=i,column=4)
     pressure_label2 = tk.Label(frame1, text="                    ", font=("Arial", 10,'bold'),foreground="Black")
     pressure_label2.grid(row=3, column=5,sticky="w")
     ProgressLabel = tk.Label(frame1,text="                      ",height=1)
     ProgressLabel.grid(row=3, column=6)
     global data
     if data != []:
-        global end_txt
+        global end_txt,stop,row_num,flag,downloadButton
         end_txt = datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
-        global stop
-        global row_num
-        global flag
         flag = 1
         row_num = row_num+1
         label = tk.Label(frame, text=end_txt, font=("Arial", 12),width=widthlist[2])
         label.grid(row=row_num, column=2)
         txt=data[1]
         data_end=end_txt
-        global downloadButton
         downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,data_end),width=10)
         downloadButton.grid(row=row_num, column=9)
         downloadButton.config(state=tk.NORMAL)
@@ -387,7 +346,6 @@ def export_data(timestamp,end_txt):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM CycleData WHERE DateTime BETWEEN ? AND ?", (timestamp,end_txt,))
     rows = cursor.fetchall()
-    #conn.close()
 
     # Write to a CSV file
     filename = f"export_Cycle_Count_{timestamp.replace(' ', '_').replace(':', '-')}.csv"
@@ -432,12 +390,10 @@ def Cycle_downloader():
    t5 = threading.Thread(target=export_data)
    t5.start()
 def CumCycle_downloader():
-    #print("Downloading...")
     conn = sqlite3.connect('EnduranceTesting.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM SensorData")
     rows = cursor.fetchall()
-    #conn.close()
 
     # Write to a CSV file
     filename = f"export_AllSensorData.csv"
@@ -610,10 +566,6 @@ header_labels = ["S No", "Start Date & Time", "End Date & Time", "SV01", "SV02",
 widthlist=[]
 for i, label_text in enumerate(header_labels):
     chars=len(label_text)
-    # if i==0:
-    #     label = tk.Label(frame_table, text=label_text, font=("Arial", 12, "bold"),width=15)
-    #     widthlist.append(15)
-    # else:
     label = tk.Label(frame_table, text=label_text, font=("Arial", 12, "bold"),width=chars+4)
     widthlist.append(chars+4)
     label.grid(row=0, column=i)
@@ -635,16 +587,7 @@ def disp_tempPress(sv013,sv02,now,press1,temp1,press2,temp2):
   global downloadButton
   global txt
   data=[]
-#   data[0]=row_num+1
-#   data[1]=now
-#   data[3]=sv013
-#   data[4]=sv02
-#   data[5]=press1
-#   data[6]=temp1
-#   data[7]=press2
-#   data[8]=temp2
   data.extend([row_num+1,now,0,sv013,sv02,press1,temp1,press2,temp2])
-  #print(data)
   for col_num, data_item in enumerate(data):
     if col_num == 2:
         widths=19
@@ -673,5 +616,4 @@ CumCycleDownload.grid(row=1, column=3)
 CumCycleDownload.config(state=tk.DISABLED)
 frame2.rowconfigure(list(range(3)), weight = 1, uniform="Silent_Creme")
 frame2.columnconfigure(list(range(4)), weight = 1, uniform="Silent_Creme")
-#ErrorLogFile.close()
 window.mainloop()

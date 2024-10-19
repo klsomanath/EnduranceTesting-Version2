@@ -9,11 +9,8 @@ def getPress1():
     chan = AnalogIn(ads, ADS.P0)
     val=chan.value
     volt=chan.voltage
-    #print(volt)
     current12 = (volt * 10)
     pressure12 = round(((current12 - 4) / (20 - 0)) * 40,2)
-    #print(f"Pressure: {pressure12} bar")
-    #time.sleep(1)
     return pressure12
 def getPress2():
     import time
@@ -26,8 +23,6 @@ def getPress2():
     chan = AnalogIn(ads, ADS.P0)
     val=chan.value
     volt=chan.voltage
-    #print(volt)
     current12 = (volt * 10)
     pressure12 = round(((current12 - 4) / (20 - 0)) * 40,2)
-    #print(f"Pressure: {pressure12} bar")
     return pressure12
