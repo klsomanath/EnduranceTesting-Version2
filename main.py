@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-import time,TempHumidity,datetime,Temp,Press,dataBase,sqlite3,csv,threading
+import time,TempHumidity,datetime,Temp,Press,dataBase,sqlite3,csv,threading,Cycles
 from PIL import ImageTk, Image, ImageSequence
-global row_num,end_txt,data,flag, temp,pressure,stop,itr_time,sv013,sv02,sensor_data, display
+global row_num,end_txt,data,flag, temp,pressure,stop,itr_time,ev08,ev09,ev13,sensor_data, display
 data=sensor_data=fault=[]
 display=flag=row_num=0
-itr_time=2
+itr_time=0
 enable1=1
 stop = False
 window=tk.Tk()
@@ -45,6 +45,13 @@ frame_header.columnconfigure(list(range(2)), weight = 1, uniform="Silent_Creme")
 
 ## --------------------- Frame 1 ---------------------------------------------------
 def systemOn():
+    while len(PartNoinfo_box.get("1.0", "end-1c")) == 0 or len(SerialNoinfo_box.get("1.0", "end-1c")) == 0 or len(Userinfo_box.get("1.0", "end-1c")) == 0 :
+        info_box.configure(state="normal")
+        info_box.insert(tk.END, f"Please Enter User Details!!! \n\n")
+        info_box.see(tk.END)
+        info_box.configure(state="disabled")
+        #print("the widget is empty")
+        time.sleep(10)
     global ErrorLogFile
     ErrorLogFile = open(filename,"w")
     SystemOn.config(state=tk.DISABLED)
@@ -237,6 +244,9 @@ def systemOff():
     info_box.config(state='normal')
     info_box.delete(1.0,END)
     info_box.config(state='disabled')
+    PartNoinfo_box.delete(1.0,END)
+    SerialNoinfo_box.delete(1.0,END)
+    Userinfo_box.delete(1.0,END)
     ErrorLogFile.close()
     Pass_Label = tk.Label(frame1, text="          ",font=("Arial", 10,'bold'))
     Pass_Label.grid(row=1,column=3)
@@ -254,8 +264,8 @@ def systemOff():
     return
 def cycleOn():
     initialDate=datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S")
-    global flag, display,itr_time,sensor_data,stop,sv013,sv02
-    flag = display = sv013 = sv02 = 0
+    global flag, display,itr_time,sensor_data,stop,ev08,ev09,ev13
+    flag = display = ev08 = ev09 = ev13 = 0
     stop = True
     CycleOff.config(state=tk.NORMAL)
     CycleOn.config(state=tk.DISABLED)
@@ -298,22 +308,25 @@ def cycleOn():
         ProgressLabel1 = tk.Label(frame1,text="                    ",height=1)
         ProgressLabel1.grid(row=3, column=6)
         return
-      cycle_data=[]
-      cycle_data.append(str(i+1))
-      cycle_data.append(now)
-      if itr_time%2==1:
-        cycle_data.append(1)
-        cycle_data.append(0)
-        cycle_data.append(1)
-        sv013+=1
-      else:
-        cycle_data.append(0)
-        cycle_data.append(1)
-        cycle_data.append(0)
-        sv02+=1
-      disp_tempPress(sv013,sv02,initialDate,sensor_data[2],sensor_data[3],sensor_data[4],sensor_data[5])
+      Cycles.EVXX(now,itr_time)
+      if itr_time == 6:
+          itr_time = 0
+    #   cycle_data=[]
+    #   cycle_data.append(str(i+1))
+    #   cycle_data.append(now)
+    #   if itr_time%2==1:
+    #     cycle_data.append(1)
+    #     cycle_data.append(0)
+    #     cycle_data.append(1)
+    #     ev08+=1
+    #   else:
+    #     cycle_data.append(0)
+    #     cycle_data.append(1)
+    #     cycle_data.append(0)
+    #     ev09+=1
+      disp_tempPress(ev08,ev09,ev13,initialDate,sensor_data[2],sensor_data[3],sensor_data[4],sensor_data[5])
       dataBase.addSensorData(sensor_data)
-      dataBase.addCycleData(cycle_data)
+      #dataBase.addCycleData(cycle_data)
       time.sleep(1)
 def cycleOff():
     pressure_label2 = tk.Label(frame1, text="                    ", font=("Arial", 10,'bold'),foreground="Black")
@@ -471,14 +484,14 @@ PartNoinfo_box.grid(row=0,column=5)
 SerialNolabel = tk.Label(frame1, text="Serial No: ",font=("Arial",12,'bold'))
 SerialNolabel.grid(row=1,column=4,sticky="w")
 
-PartNoinfo_box = tk.Text(frame1, state="normal",width=18,height=1)
-PartNoinfo_box.grid(row=1,column=5)
+SerialNoinfo_box = tk.Text(frame1, state="normal",width=18,height=1)
+SerialNoinfo_box.grid(row=1,column=5)
 
 Userlabel = tk.Label(frame1, text="User: ",font=("Arial",12,'bold'))
 Userlabel.grid(row=2,column=4,sticky="w")
 
-PartNoinfo_box = tk.Text(frame1, state="normal",width=18,height=1)
-PartNoinfo_box.grid(row=2,column=5)
+Userinfo_box = tk.Text(frame1, state="normal",width=18,height=1)
+Userinfo_box.grid(row=2,column=5)
 # #--------------------- Table Frame ------------------------
 
 frame_table = tk.Frame(window, border=4,relief=RIDGE)
@@ -561,7 +574,7 @@ for j in range(len(databaselist)):
     downloadButtonhist.config(state=tk.NORMAL)
 
 
-header_labels = ["S No", "Start Date & Time", "End Date & Time", "SV01", "SV02","Press. Sensor 1","Temp. Sensor 1","Press. Sensor 2","Temp. Sensor 2","Download"]
+header_labels = ["S No", "Start Date & Time", "End Date & Time", "EV08", "EV09","EV13","Press. Sensor 1","Temp. Sensor 1","Press. Sensor 2","Temp. Sensor 2","Download"]
 
 widthlist=[]
 for i, label_text in enumerate(header_labels):
@@ -580,14 +593,14 @@ canvas.create_window((0, 0), window=frame, anchor="e")
 canvas.config(scrollregion=(0, 0, frame.winfo_width(), frame.winfo_height()))
 canvas.yview_moveto(1.0)
 
-def disp_tempPress(sv013,sv02,now,press1,temp1,press2,temp2):
+def disp_tempPress(ev08,ev09,ev13,now,press1,temp1,press2,temp2):
   global data,flag
   if flag==1:
      return
   global downloadButton
   global txt
   data=[]
-  data.extend([row_num+1,now,0,sv013,sv02,press1,temp1,press2,temp2])
+  data.extend([row_num+1,now,0,ev08,ev09,ev13,press1,temp1,press2,temp2])
   for col_num, data_item in enumerate(data):
     if col_num == 2:
         widths=19

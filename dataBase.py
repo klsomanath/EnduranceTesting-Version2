@@ -17,7 +17,7 @@ def addCycleData(cycle_data):
     conn = sqlite3.connect('EnduranceTesting.db')
     cursor = conn.cursor()
     try:
-        cursor.execute("""CREATE TABLE CycleData(SNo VARCHAR(255), DateTime VARCHAR(255), SV01 VARCHAR(255), SV02 VARCHAR(255), SV03 VARCHAR(255));""")
+        cursor.execute("""CREATE TABLE CycleData(SNo VARCHAR(255), DateTime VARCHAR(255), EV08 VARCHAR(255), EV09 VARCHAR(255), EV13 VARCHAR(255));""")
     except:
         pass
 
