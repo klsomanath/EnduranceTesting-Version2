@@ -195,7 +195,7 @@ def disp_temp():
         pressure_label2 = tk.Label(frame1, text=press2, font=("Arial", 10,'bold'),foreground="Black")
         pressure_label2.grid(row=8, column=3)
         window.update()
-    if (temp11/2 >= 20 and temp11/2 <= 50) and (humid1/2 >= 20 and humid1/2 <= 99):
+    if (temp11/2 >= 15 and temp11/2 <= 50) and (humid1/2 >= 20 and humid1/2 <= 99):
         enable=checkTempPress(temp13,press13,temp23,press23,2)
     else:
       Pass_Label = tk.Label(frame1, text="FAIL ",font=("Arial", 10,'bold'),foreground="RED")
@@ -308,7 +308,7 @@ def cycleOn():
         ProgressLabel1 = tk.Label(frame1,text="                    ",height=1)
         ProgressLabel1.grid(row=3, column=6)
         return
-      Cycles.EVXX(now,itr_time)
+      cycle_data,ev08,ev09,ev13 = Cycles.EVXX(now,itr_time,ev08,ev09,ev13)
       if itr_time == 6:
           itr_time = 0
     #   cycle_data=[]
@@ -344,7 +344,7 @@ def cycleOff():
         txt=data[1]
         data_end=end_txt
         downloadButton = tk.Button(frame, text="Download",command=lambda: export_data(txt,data_end),width=10)
-        downloadButton.grid(row=row_num, column=9)
+        downloadButton.grid(row=row_num, column=10)
         downloadButton.config(state=tk.NORMAL)
         global display
         display = 1

@@ -9,7 +9,6 @@ def getTemp1():
         return a
     except KeyboardInterrupt:
         return 0
-        pass
 def getTemp2():
     import max6675
     cs = 7
@@ -21,4 +20,3 @@ def getTemp2():
         return a
     except KeyboardInterrupt:
         return 0
-        pass

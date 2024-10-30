@@ -1,4 +1,4 @@
-def EVXX(now,i):
+def EVXX(now,i,ev08c,ev09c,ev13c):
     import RPi.GPIO as GPIO
     import time,dataBase
     GPIO.setmode(GPIO.BCM)
@@ -24,7 +24,8 @@ def EVXX(now,i):
             cycle_data.append(1)
             cycle_data.append(0)
             cycle_data.append(0)
-            time.sleep(1)
+            ev08c+=1
+            time.sleep(0.5)
         if i == 2:
             GPIO.output(ev08,GPIO.LOW)
             GPIO.output(ev09,GPIO.HIGH)
@@ -32,7 +33,9 @@ def EVXX(now,i):
             cycle_data.append(1)
             cycle_data.append(0)
             cycle_data.append(1)
-            time.sleep(1)
+            ev08c+=1
+            ev13c+=1
+            time.sleep(0.5)
         if i == 3:
             GPIO.output(ev08,GPIO.HIGH)
             GPIO.output(ev09,GPIO.HIGH)
@@ -40,7 +43,7 @@ def EVXX(now,i):
             cycle_data.append(0)
             cycle_data.append(0)
             cycle_data.append(0)
-            time.sleep(1)
+            time.sleep(0.5)
         if i == 4:
             GPIO.output(ev08,GPIO.HIGH)
             GPIO.output(ev09,GPIO.LOW)
@@ -48,7 +51,8 @@ def EVXX(now,i):
             cycle_data.append(0)
             cycle_data.append(1)
             cycle_data.append(0)
-            time.sleep(1)
+            ev09c+=1
+            time.sleep(0.5)
         if i == 5:
             GPIO.output(ev08,GPIO.HIGH)
             GPIO.output(ev09,GPIO.HIGH)
@@ -56,7 +60,8 @@ def EVXX(now,i):
             cycle_data.append(0)
             cycle_data.append(0)
             cycle_data.append(1)
-            time.sleep(1)
+            ev13c+=1
+            time.sleep(0.5)
         if i == 6:
             GPIO.output(ev08,GPIO.HIGH)
             GPIO.output(ev09,GPIO.HIGH)
@@ -64,7 +69,7 @@ def EVXX(now,i):
             cycle_data.append(0)
             cycle_data.append(0)
             cycle_data.append(0)
-            time.sleep(1)
+            time.sleep(0.5)
         dataBase.addCycleData(cycle_data)
     except:
         pass
@@ -72,4 +77,4 @@ def EVXX(now,i):
         GPIO.output(ev08,GPIO.HIGH)
         GPIO.output(ev09,GPIO.HIGH)
         GPIO.output(ev13,GPIO.HIGH)
-        GPIO.cleanup()
+    return cycle_data,ev08c,ev09c,ev13c
