@@ -6,6 +6,8 @@ from PIL import ImageTk, Image, ImageSequence
 global row_num,end_txt,data,flag, temp,pressure,stop,itr_time,ev08,ev09,ev13,sensor_data, display
 data=sensor_data=fault=[]
 display=flag=row_num=0
+import os
+home="/home/me/Documents/EnduranceTesting-Version2"
 itr_time=0
 enable1=1
 stop = False
@@ -14,7 +16,7 @@ w, h = window.winfo_screenwidth(), window.winfo_screenheight()
 window.geometry("%dx%d+0+0" % (w, h))
 window.title("System ON/OFF Controller")
 window.grid_propagate(True)
-filename="Log-"+str(datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S"))+".txt"
+filename=home+"/Log-"+str(datetime.datetime.now().strftime("%d-%b-%y %H:%M:%S"))+".txt"
 global ErrorLogFile
 ## ------------------------------------ Header Frame -----------------------------------------------------
 
@@ -29,7 +31,7 @@ Header.grid(row=0,column=0,sticky="e")
 Header2 = tk.Label(frame_header,text="                                                                                             Endurance Testing",font=("Arial", 14,'bold'),foreground="Black")
 Header2.grid(row=1,column=0,sticky="nsew")
 
-img = Image.open("NuconLogo.png")
+img = Image.open(home+"/NuconLogo.png")
 img = ImageTk.PhotoImage(img,master=frame_header)
 img_label = tk.Label(frame_header,image = img)
 img_label.image = img
@@ -274,7 +276,7 @@ def cycleOn():
     pressure_label2 = tk.Label(frame1, text="CYCLE ON", font=("Arial", 12,'bold'),foreground="Black")
     pressure_label2.grid(row=3, column=5,sticky="w")
     fixed_size=(20,20)
-    gif = Image.open("DownloadFile.gif")
+    gif = Image.open(home+"/DownloadFile.gif")
     frames = [ImageTk.PhotoImage(frame.copy().resize(fixed_size, Image.Resampling.LANCZOS)) for frame in ImageSequence.Iterator(gif)]
     ProgressLabel = tk.Label(frame1)
     ProgressLabel.grid(row=3, column=6,sticky="w")
@@ -355,13 +357,13 @@ def cycleOff():
     window.update()
     return
 def export_data(timestamp,end_txt):
-    conn = sqlite3.connect('EnduranceTesting.db')
+    conn = sqlite3.connect(home+'/EnduranceTesting.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM CycleData WHERE DateTime BETWEEN ? AND ?", (timestamp,end_txt,))
     rows = cursor.fetchall()
 
     # Write to a CSV file
-    filename = f"export_Cycle_Count_{timestamp.replace(' ', '_').replace(':', '-')}.csv"
+    filename = f"{home}/export_Cycle_Count_{timestamp.replace(' ', '_').replace(':', '-')}.csv"
     with open(filename, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["S.No", "Time", "SV - 01","SV - 02","SV - 03"])
@@ -372,7 +374,7 @@ def export_data(timestamp,end_txt):
     conn.close()
 
     # Write to a CSV file
-    filename1 = f"export_SensorData_{timestamp.replace(' ', '_').replace(':', '-')}.csv"
+    filename1 = f"{home}/export_SensorData_{timestamp.replace(' ', '_').replace(':', '-')}.csv"
     with open(filename1, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["S.No", "Time", "Pressure Sensor - 1","Temparature Sensor - 1","Pressure Sensor - 2","Temparature Sensor - 2"])
@@ -403,13 +405,13 @@ def Cycle_downloader():
    t5 = threading.Thread(target=export_data)
    t5.start()
 def CumCycle_downloader():
-    conn = sqlite3.connect('EnduranceTesting.db')
+    conn = sqlite3.connect(home+'/EnduranceTesting.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM SensorData")
     rows = cursor.fetchall()
 
     # Write to a CSV file
-    filename = f"export_AllSensorData.csv"
+    filename = f"{home}/export_AllSensorData.csv"
     with open(filename, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["S.No", "Time", "Pressure Sensor - 1","Temparature Sensor - 1","Pressure Sensor - 2","Temparature Sensor - 2"])
@@ -420,7 +422,7 @@ def CumCycle_downloader():
     conn.close()
 
     # Write to a CSV file
-    filename1 = f"export_AllCycleData.csv"
+    filename1 = f"{home}/export_AllCycleData.csv"
     with open(filename1, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["S.No", "Time", "SV - 01","SV - 02","SV - 03"])
@@ -515,7 +517,7 @@ frame12.columnconfigure(list(range(3)), weight = 1, uniform="Silent_Creme")
 label = tk.Label(frame_table2, text="Historical Data", font=("Arial", 12, "bold"))
 label.grid(row=0, column=1)
 
-conn = sqlite3.connect('EnduranceTesting.db')
+conn = sqlite3.connect(home+'/EnduranceTesting.db')
 cursor = conn.cursor()
 cursor.execute("SELECT * FROM SensorData")
 rows = cursor.fetchall()
@@ -543,19 +545,19 @@ frame12.update_idletasks()
 
 def export_hist_data(datee):
     print(datee)
-    conn = sqlite3.connect('EnduranceTesting.db')
+    conn = sqlite3.connect(home+'/EnduranceTesting.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM SensorData WHERE DateTime LIKE ?",(datee+"%",))
     dataSensor=cursor.fetchall()
     cursor.execute("SELECT * FROM CycleData WHERE DateTime LIKE ?",(datee+"%",))
     dataCycle=cursor.fetchall()
     conn.close()
-    filename = f"export_All {datee} HistoricSensorData.csv"
+    filename = f"{home}/export_All {datee} HistoricSensorData.csv"
     with open(filename, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["S.No", "Time", "Pressure Sensor - 1","Temparature Sensor - 1","Pressure Sensor - 2","Temparature Sensor - 2"])
         csvwriter.writerows(dataSensor)
-    filename1 = f"export_All {datee} HistoricCycleData.csv"
+    filename1 = f"{home}/export_All-{datee}-HistoricCycleData.csv"
     with open(filename1, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["S.No", "Time", "SV - 01","SV - 02","SV - 03"])

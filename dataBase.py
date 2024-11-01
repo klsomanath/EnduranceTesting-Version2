@@ -1,6 +1,6 @@
 def addSensorData(sensor_data):
     import sqlite3
-    conn = sqlite3.connect('EnduranceTesting.db')
+    conn = sqlite3.connect('/home/me/Documents/EnduranceTesting-Version2/EnduranceTesting.db')
     cursor = conn.cursor()
     try:
         cursor.execute("""CREATE TABLE SensorData(SNo VARCHAR(255), DateTime VARCHAR(255), PressureSensor1 VARCHAR(255), TemparatureSensor1 VARCHAR(255), PressureSensor2 VARCHAR(255), TemparatureSensor2 VARCHAR(255));""")
@@ -14,7 +14,7 @@ def addSensorData(sensor_data):
 
 def addCycleData(cycle_data):
     import sqlite3
-    conn = sqlite3.connect('EnduranceTesting.db')
+    conn = sqlite3.connect('/home/me/Documents/EnduranceTesting-Version2/EnduranceTesting.db')
     cursor = conn.cursor()
     try:
         cursor.execute("""CREATE TABLE CycleData(SNo VARCHAR(255), DateTime VARCHAR(255), EV08 VARCHAR(255), EV09 VARCHAR(255), EV13 VARCHAR(255));""")
